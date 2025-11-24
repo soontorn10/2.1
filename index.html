@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ใบงานออนไลน์: เครื่องดนตรีประเภทอะไรกันนะ</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Fonts: Sarabun for Thai support -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300&display=swap" rel="stylesheet">
+    
+    <!-- Libraries: Confetti & html2canvas -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        // --- CONFIGURATION ---
+        const appConfig = {
+            title: "ใบงานที่ 2.1",
+            subtitle: "เรื่อง เครื่องดนตรีประเภทอะไรกันนะ",
+            indicator: "ตัวชี้วัด : ศ 2.2 ม.1/4",
+            instruction: "คำชี้แจง : ให้นักเรียนฟังเสียงเครื่องดนตรีจาก YouTube แล้วระบุชื่อเครื่องดนตรี ประเภท และวัสดุที่ใช้ในการประดิษฐ์ (สามารถมีได้มากกว่า 1 คำตอบ)",
+            totalItems: 10,
+            
+            // ลิงก์ YouTube
+            youtubeLinks: [
+                "https://youtu.be/kw-oWosIPhE", "https://youtu.be/7LBvb40Nx-w",
+                "https://youtu.be/5Eza7UFBNps", "https://youtu.be/s8VScVezb70",
+                "https://youtu.be/Cg_dNXjjdsg", "https://youtu.be/kXsGuzjZA4E",
+                "https://youtu.be/f5AaDCoDZDE", "https://youtu.be/VHPGh_i8c7c",
+                "https://youtu.be/TVbgaGwqGNE", "https://youtu.be/E7y6T-1FRfw"
+            ],
+
+            // --- ส่วนเฉลยคำตอบ (Answer Key) ---
+            // อัปเดตให้ตรงกับรายการที่คุณแจ้งมา (1-10)
+            correctAnswers: [
+                { id: 1, names: ["ระนาดเอก", "ระนาด"], types: ["ตี", "เครื่องตี"] },
+                { id: 2, names: ["ซอด้วง"], types: ["สี", "เครื่องสี"] },
+                { id: 3, names: ["จะเข้"], types: ["ดีด", "เครื่องดีด"] },
+                { id: 4, names: ["กลองแขก", "กลอง"], types: ["ตี", "เครื่องตี"] },
+                { id: 5, names: ["ปี่ใน", "ปี่"], types: ["เป่า", "เครื่องเป่า"] },
+                { id: 6, names: ["ขิม"], types: ["ตี", "เครื่องตี"] },
+                { id: 7, names: ["ฆ้องวงใหญ่", "ฆ้องวง", "ฆ้อง"], types: ["ตี", "เครื่องตี"] },
+                { id: 8, names: ["ขลุ่ยเพียงออ", "ขลุ่ย"], types: ["เป่า", "เครื่องเป่า"] },
+                { id: 9, names: ["ระนาดทุ้ม"], types: ["ตี", "เครื่องตี"] },
+                { id: 10, names: ["ซออู้"], types: ["สี", "เครื่องสี"] }
+            ]
+            // *หมายเหตุ: วัสดุ ไม่ได้นำมาคิดคะแนนเนื่องจากคำตอบหลากหลายเกินไป แต่จะแสดงผลปกติ
+        };
+
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Sarabun', 'sans-serif'],
+                    },
+                    colors: {
+                        'brand': {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1', // Indigo
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Background Pattern */
+        body {
+            background-color: #f3f4f6;
+            background-image: radial-gradient(#e0e7ff 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+
+        /* Custom Styles for Printing/Capturing */
+        .capture-mode {
+            width: 1000px !important;
+            max-width: 1000px !important;
+            margin: 0 auto !important;
+            background-color: white !important;
+            padding: 40px !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            overflow: visible !important;
+        }
+
+        .capture-mode .no-print {
+            display: none !important;
+        }
+
+        /* Watermark Styling */
+        .watermark {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-30deg);
+            font-size: 40px; /* Adjusted for potentially long names */
+            color: rgba(99, 102, 241, 0.15); /* Brand color transparent */
+            font-weight: bold;
+            white-space: nowrap;
+            pointer-events: none;
+            z-index: 0;
+            border: 4px solid rgba(99, 102, 241, 0.15);
+            padding: 20px 40px;
+            border-radius: 20px;
+        }
+
+        .capture-mode .watermark {
+            display: block;
+        }
+
+        /* Newspaper Column Layout */
+        .newspaper-layout {
+            column-count: 1;
+            gap: 1.5rem;
+        }
+        @media (min-width: 768px) {
+            .newspaper-layout {
+                column-count: 2;
+            }
+        }
+        
+        .break-inside-avoid {
+            break-inside: avoid;
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col text-gray-800 font-sans">
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-grow container mx-auto px-4 py-8 max-w-3xl relative z-10">
+        
+        <!-- HEADER -->
+        <header class="text-center mb-8 bg-white/80 backdrop-blur-sm p-6 rounded-3xl shadow-sm border border-white/50">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-brand-500 to-purple-600 text-white mb-4 shadow-lg transform hover:scale-110 transition-transform duration-300">
+                <i class="fas fa-music text-3xl"></i>
+            </div>
+            <h1 class="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-purple-600" id="app-title"></h1>
+            <p class="text-lg text-gray-600 mt-2 font-medium" id="app-subtitle"></p>
+            <span class="inline-block mt-2 px-4 py-1 bg-brand-50 text-brand-700 rounded-full text-sm font-semibold border border-brand-100" id="app-indicator"></span>
+        </header>
+
+        <!-- STEPPER -->
+        <div class="mb-8 px-4">
+            <div class="flex items-center justify-between relative max-w-md mx-auto">
+                <div class="absolute left-0 top-1/2 transform -translate-y-1/2 w-full h-1.5 bg-gray-200 rounded-full -z-10 overflow-hidden">
+                    <div id="progress-bar" class="h-full bg-gradient-to-r from-brand-500 to-purple-500 w-0 transition-all duration-500"></div>
+                </div>
+                <!-- Step 1 -->
+                <div id="step-1-indicator" class="relative w-12 h-12 rounded-full flex items-center justify-center font-bold border-4 border-white shadow-md transition-all duration-300 bg-gradient-to-br from-brand-500 to-purple-600 text-white transform scale-110">
+                    1
+                    <div class="absolute -bottom-6 text-xs font-bold text-brand-600 whitespace-nowrap">ข้อมูล</div>
+                </div>
+                <!-- Step 2 -->
+                <div id="step-2-indicator" class="relative w-12 h-12 rounded-full flex items-center justify-center font-bold border-4 border-white shadow-md transition-all duration-300 bg-gray-300 text-gray-500">
+                    2
+                    <div class="absolute -bottom-6 text-xs font-medium text-gray-400 whitespace-nowrap">ทำใบงาน</div>
+                </div>
+                <!-- Step 3 -->
+                <div id="step-3-indicator" class="relative w-12 h-12 rounded-full flex items-center justify-center font-bold border-4 border-white shadow-md transition-all duration-300 bg-gray-300 text-gray-500">
+                    3
+                    <div class="absolute -bottom-6 text-xs font-medium text-gray-400 whitespace-nowrap">สรุปผล</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE 1: Student Info -->
+        <div id="page-1" class="bg-white rounded-3xl shadow-xl p-6 md:p-10 fade-in border border-gray-100">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                <div class="w-1.5 h-8 bg-brand-500 rounded-full"></div>
+                ข้อมูลผู้เรียน
+            </h2>
+            <form id="info-form" onsubmit="handlePage1Submit(event)">
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">ชื่อ-นามสกุล <span class="text-red-500">*</span></label>
+                        <div class="relative group">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-user text-gray-400 group-focus-within:text-brand-500 transition-colors"></i>
+                            </div>
+                            <input type="text" id="student-name" required 
+                                class="pl-10 w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 focus:bg-white outline-none transition-all duration-200" 
+                                placeholder="เช่น ด.ช. รักดี มีวินัย">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">ชั้น <span class="text-red-500">*</span></label>
+                            <div class="relative group">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-graduation-cap text-gray-400 group-focus-within:text-brand-500 transition-colors"></i>
+                                </div>
+                                <input type="text" id="student-class" required 
+                                    class="pl-10 w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 focus:bg-white outline-none transition-all duration-200" 
+                                    placeholder="เช่น ม.1/1">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">เลขที่ <span class="text-red-500">*</span></label>
+                            <div class="relative group">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-list-ol text-gray-400 group-focus-within:text-brand-500 transition-colors"></i>
+                                </div>
+                                <input type="number" id="student-no" required 
+                                    class="pl-10 w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 focus:bg-white outline-none transition-all duration-200" 
+                                    placeholder="เช่น 9">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-10 flex justify-end">
+                    <button type="submit" class="group relative inline-flex items-center justify-center px-8 py-3 text-lg font-bold text-white transition-all duration-200 bg-gradient-to-r from-brand-600 to-purple-600 rounded-full shadow-lg hover:from-brand-700 hover:to-purple-700 hover:shadow-xl hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500">
+                        <span>เริ่มทำใบงาน</span>
+                        <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- PAGE 2: Worksheet -->
+        <div id="page-2" class="hidden bg-white rounded-3xl shadow-xl p-6 md:p-10 fade-in border border-gray-100">
+            <h2 class="text-2xl font-bold text-gray-800 mb-2 flex items-center gap-3">
+                <div class="w-1.5 h-8 bg-brand-500 rounded-full"></div>
+                แบบฝึกหัด
+            </h2>
+            <div class="bg-brand-50 p-4 rounded-2xl border border-brand-100 mb-8 flex items-start gap-3">
+                <i class="fas fa-info-circle text-brand-500 mt-1 text-xl"></i>
+                <p class="text-gray-700 font-medium" id="worksheet-instruction"></p>
+            </div>
+
+            <form id="worksheet-form" onsubmit="handlePage2Submit(event)">
+                <div id="worksheet-container" class="space-y-8">
+                    <!-- Dynamic Items -->
+                </div>
+                
+                <div class="mt-10 flex justify-between items-center pt-6 border-t border-gray-100">
+                    <button type="button" onclick="changePage(1)" class="text-gray-500 hover:text-gray-700 font-bold px-6 py-3 rounded-full hover:bg-gray-100 transition flex items-center gap-2">
+                        <i class="fas fa-arrow-left"></i> ย้อนกลับ
+                    </button>
+                    <button type="submit" class="group relative inline-flex items-center justify-center px-8 py-3 text-lg font-bold text-white transition-all duration-200 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full shadow-lg hover:from-green-600 hover:to-emerald-700 hover:shadow-xl hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                        <span>ส่งคำตอบ</span>
+                        <i class="fas fa-paper-plane ml-2 group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- PAGE 3: Dashboard (Summary) -->
+        <div id="page-3" class="hidden fade-in pb-20">
+            
+            <!-- Submit Instruction Modal (Initially Hidden) -->
+            <div id="submit-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden transition-opacity duration-300">
+                <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-6 text-center transform scale-100 transition-transform duration-300 relative">
+                    <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 bg-gray-100 hover:bg-gray-200 w-8 h-8 rounded-full flex items-center justify-center transition">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    
+                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-check text-3xl text-green-600"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2">บันทึกข้อมูลสำเร็จ!</h3>
+                    <p class="text-gray-600 mb-2" id="modal-score-text"></p>
+                    <p class="text-gray-500 text-sm mb-6">กดบันทึกภาพแล้วนำไปส่งได้เลย</p>
+                    
+                    <div class="bg-blue-50 rounded-xl p-4 mb-6 text-left">
+                        <h4 class="text-sm font-bold text-blue-800 mb-2 uppercase tracking-wider">วิธีส่งงานใน Google Classroom</h4>
+                        <ol class="text-sm text-blue-700 space-y-2 list-decimal list-inside">
+                            <li>กดปุ่ม <b class="text-green-700"><i class="fas fa-download"></i> บันทึกเป็นภาพ</b> ด้านล่าง</li>
+                            <li>ภาพผลงานจะถูกดาวน์โหลดลงเครื่อง</li>
+                            <li>ไปที่ Google Classroom รายวิชานี้</li>
+                            <li>แนบไฟล์ภาพที่ดาวน์โหลด ส่งในงานที่กำหนด</li>
+                        </ol>
+                    </div>
+                    
+                    <button onclick="closeModal()" class="w-full bg-gray-800 hover:bg-gray-900 text-white font-bold py-3 rounded-xl transition shadow-lg">
+                        เข้าใจแล้ว
+                    </button>
+                </div>
+            </div>
+
+            <!-- Actions Toolbar -->
+            <div class="flex flex-wrap justify-center gap-4 mb-8 no-print sticky top-4 z-40">
+                <button onclick="startDownload()" class="bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold py-3 px-8 rounded-full shadow-lg flex items-center gap-2 transition transform hover:-translate-y-1 hover:shadow-xl ring-4 ring-white">
+                    <i class="fas fa-download"></i> บันทึกเป็นภาพ (ส่งครู)
+                </button>
+                <button onclick="resetApp()" class="bg-white text-red-500 border-2 border-red-100 font-bold py-3 px-6 rounded-full shadow-md flex items-center gap-2 transition transform hover:-translate-y-1 hover:bg-red-50">
+                    <i class="fas fa-redo"></i> เริ่มใหม่
+                </button>
+            </div>
+
+            <!-- Capture Area -->
+            <div id="capture-area" class="bg-white rounded-3xl shadow-xl overflow-hidden relative border border-gray-200">
+                
+                <!-- Header Decoration -->
+                <div class="h-4 bg-gradient-to-r from-brand-500 via-purple-500 to-pink-500"></div>
+
+                <!-- Content Container -->
+                <div class="p-8 md:p-12 relative">
+                    
+                    <!-- Watermark (Dynamic) -->
+                    <div class="watermark" id="dynamic-watermark"></div>
+
+                    <!-- Summary Header -->
+                    <div class="text-center mb-8 pb-6 border-b-2 border-gray-100">
+                        <div class="inline-block bg-brand-100 text-brand-600 p-3 rounded-2xl mb-3">
+                            <i class="fas fa-file-contract text-3xl"></i>
+                        </div>
+                        <h2 class="text-3xl font-bold text-gray-800">ใบสรุปผลงาน</h2>
+                        <p class="text-brand-600 text-lg font-medium mt-1" id="summary-subtitle"></p>
+                    </div>
+
+                    <!-- Student Card -->
+                    <div class="bg-gradient-to-r from-gray-50 to-white rounded-2xl border border-gray-200 p-5 mb-8 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full bg-brand-500 text-white flex items-center justify-center font-bold text-xl shadow-md">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500 font-semibold uppercase tracking-wider">ชื่อ-นามสกุล</p>
+                                <p class="text-xl font-bold text-gray-800" id="summary-name">-</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-6 bg-white px-6 py-2 rounded-xl shadow-sm border border-gray-100">
+                            <div class="text-center">
+                                <p class="text-xs text-gray-400 font-bold uppercase">ชั้น</p>
+                                <p class="text-xl font-bold text-brand-600" id="summary-class">-</p>
+                            </div>
+                            <div class="w-px bg-gray-200"></div>
+                            <div class="text-center">
+                                <p class="text-xs text-gray-400 font-bold uppercase">เลขที่</p>
+                                <p class="text-xl font-bold text-brand-600" id="summary-no">-</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Score/Status -->
+                    <div class="bg-gradient-to-r from-brand-600 to-purple-600 text-white rounded-2xl p-6 mb-8 relative overflow-hidden shadow-lg">
+                        <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-4">
+                            <div class="flex items-center gap-3">
+                                <div class="bg-white/20 p-3 rounded-full">
+                                    <i class="fas fa-star text-2xl text-yellow-300"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-2xl font-bold" id="total-score-display">คะแนน: - / 20</h3>
+                                    <p class="text-brand-100 text-sm">ระบบตรวจคำตอบอัตโนมัติ</p>
+                                </div>
+                            </div>
+                            <div class="bg-white/10 px-4 py-2 rounded-lg border border-white/20 backdrop-blur-sm">
+                                <span class="text-white font-bold text-lg">ส่งงานครบ 10 ข้อ</span>
+                            </div>
+                        </div>
+                        <!-- Decor circles -->
+                        <div class="absolute -right-6 -top-6 w-24 h-24 bg-white opacity-10 rounded-full"></div>
+                        <div class="absolute right-10 -bottom-10 w-32 h-32 bg-purple-400 opacity-20 rounded-full blur-xl"></div>
+                    </div>
+
+                    <!-- Answers Section -->
+                    <div class="mb-6">
+                        <h3 class="text-lg font-bold text-gray-700 mb-4 flex items-center gap-2 border-b border-gray-100 pb-2">
+                            <i class="fas fa-list-alt text-brand-500"></i> คำตอบของนักเรียน
+                        </h3>
+                        
+                        <!-- Newspaper Layout -->
+                        <div id="answers-display" class="newspaper-layout">
+                            <!-- Content -->
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="mt-12 pt-6 border-t-2 border-gray-100 flex justify-between items-end">
+                        <div>
+                            <p class="text-xs text-gray-400 font-medium">Web App ใบงานออนไลน์</p>
+                            <p class="text-xs text-gray-300 mt-0.5">พัฒนาระบบโดย: นายสุนทร ฉอมไธสง</p>
+                        </div>
+                        <div class="text-right">
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=60x60&data=GoogleClassroom" alt="QR Code" class="w-12 h-12 opacity-50 mb-1 ml-auto mix-blend-multiply">
+                            <p class="text-[10px] text-gray-400" id="timestamp"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- LOGIC -->
+    <script>
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('app-title').innerText = appConfig.title;
+            document.getElementById('app-subtitle').innerText = appConfig.subtitle;
+            document.getElementById('summary-subtitle').innerText = appConfig.subtitle;
+            document.getElementById('app-indicator').innerText = appConfig.indicator;
+            document.getElementById('worksheet-instruction').innerText = appConfig.instruction;
+            
+            loadSessionData();
+        });
+
+        // --- PAGE NAVIGATION ---
+        function changePage(page) {
+            document.getElementById('page-1').classList.add('hidden');
+            document.getElementById('page-2').classList.add('hidden');
+            document.getElementById('page-3').classList.add('hidden');
+
+            document.getElementById(`page-${page}`).classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            updateStepper(page);
+        }
+
+        function updateStepper(step) {
+            const step1 = document.getElementById('step-1-indicator');
+            const step2 = document.getElementById('step-2-indicator');
+            const step3 = document.getElementById('step-3-indicator');
+            const bar = document.getElementById('progress-bar');
+
+            // Reset base styles
+            [step1, step2, step3].forEach(el => {
+                el.className = "relative w-12 h-12 rounded-full flex items-center justify-center font-bold border-4 border-white shadow-md transition-all duration-300 bg-gray-300 text-gray-500";
+                el.querySelector('div').classList.remove('text-brand-600');
+                el.querySelector('div').classList.add('text-gray-400');
+            });
+
+            // Progress Bar
+            if (step === 1) bar.style.width = "0%";
+            if (step === 2) bar.style.width = "50%";
+            if (step === 3) bar.style.width = "100%";
+
+            // Active Steps
+            const activeClass = "bg-gradient-to-br from-brand-500 to-purple-600 text-white transform scale-110 shadow-lg ring-2 ring-brand-100";
+            
+            if (step >= 1) {
+                step1.className = "relative w-12 h-12 rounded-full flex items-center justify-center font-bold border-4 border-white transition-all duration-300 " + activeClass;
+                step1.querySelector('div').classList.add('text-brand-600');
+            }
+            if (step >= 2) {
+                step2.className = "relative w-12 h-12 rounded-full flex items-center justify-center font-bold border-4 border-white transition-all duration-300 " + activeClass;
+                step2.querySelector('div').classList.add('text-brand-600');
+            }
+            if (step >= 3) {
+                step3.className = "relative w-12 h-12 rounded-full flex items-center justify-center font-bold border-4 border-white transition-all duration-300 " + activeClass;
+                step3.querySelector('div').classList.add('text-brand-600');
+            }
+        }
+
+        // --- PAGE 1 LOGIC ---
+        function handlePage1Submit(e) {
+            e.preventDefault();
+            const name = document.getElementById('student-name').value.trim();
+            const sClass = document.getElementById('student-class').value.trim();
+            const no = document.getElementById('student-no').value.trim();
+
+            if (name && sClass && no) {
+                sessionStorage.setItem('student_name', name);
+                sessionStorage.setItem('student_class', sClass);
+                sessionStorage.setItem('student_no', no);
+                
+                renderWorksheet();
+                changePage(2);
+            }
+        }
+
+        function loadSessionData() {
+            const name = sessionStorage.getItem('student_name');
+            if (name) {
+                document.getElementById('student-name').value = name;
+                document.getElementById('student-class').value = sessionStorage.getItem('student_class');
+                document.getElementById('student-no').value = sessionStorage.getItem('student_no');
+            }
+        }
+
+        // --- PAGE 2 LOGIC ---
+        function renderWorksheet() {
+            const container = document.getElementById('worksheet-container');
+            container.innerHTML = '';
+
+            for (let i = 1; i <= appConfig.totalItems; i++) {
+                // ดึงลิงก์ YouTube ตามข้อ (ถ้าไม่มีให้ใช้ #)
+                const youtubeLink = appConfig.youtubeLinks[i-1] || '#';
+                
+                const itemHtml = `
+                    <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-200 relative overflow-hidden group">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-brand-200 group-hover:bg-brand-500 transition-colors"></div>
+                        
+                        <div class="flex flex-wrap items-center justify-between mb-4 gap-3">
+                            <span class="bg-brand-100 text-brand-700 text-sm font-extrabold px-3 py-1 rounded-lg shadow-sm">ข้อที่ ${i}</span>
+                            <a href="${youtubeLink}" target="_blank" class="text-xs text-white bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded-full shadow flex items-center gap-2 transition-transform transform hover:scale-105 no-underline">
+                                <i class="fab fa-youtube text-lg"></i> กดฟังเสียงที่ ${i}
+                            </a>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <!-- ส่วนที่เพิ่มมา: ชื่อเครื่องดนตรี -->
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">ชื่อเครื่องดนตรี <span class="text-red-400">*</span></label>
+                                <input type="text" name="name_${i}" required 
+                                    class="w-full p-3 bg-brand-50/50 border border-brand-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 focus:bg-white outline-none text-base font-medium text-brand-800 transition-all placeholder-brand-300"
+                                    placeholder="ระบุชื่อเครื่องดนตรี...">
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">ประเภทเครื่องดนตรี</label>
+                                    <input type="text" name="type_${i}" required 
+                                        class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 focus:bg-white outline-none text-sm transition-all"
+                                        placeholder="เช่น เครื่องดีด, เครื่องสี...">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">วัสดุที่ใช้ประดิษฐ์</label>
+                                    <input type="text" name="material_${i}" required 
+                                        class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 focus:bg-white outline-none text-sm transition-all"
+                                        placeholder="เช่น ไม้สัก, หนังวัว...">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += itemHtml;
+            }
+        }
+
+        // Helper function to check answer flexibility
+        function checkAnswer(userInput, validKeywords) {
+            if (!userInput) return false;
+            if (!validKeywords || validKeywords.length === 0) return false;
+            
+            // Normalize input: remove whitespace, convert to lower case (though Thai has no case)
+            const normalizedInput = userInput.toString().replace(/\s+/g, '').toLowerCase();
+            
+            // Check if any keyword exists in the normalized input
+            return validKeywords.some(keyword => {
+                const normalizedKeyword = keyword.toString().replace(/\s+/g, '').toLowerCase();
+                return normalizedInput.includes(normalizedKeyword);
+            });
+        }
+
+        function handlePage2Submit(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const answers = [];
+            let totalScore = 0;
+            
+            for (let i = 1; i <= appConfig.totalItems; i++) {
+                const nameInput = formData.get(`name_${i}`);
+                const typeInput = formData.get(`type_${i}`);
+                const materialInput = formData.get(`material_${i}`);
+                
+                // Get correct answers from config
+                const key = appConfig.correctAnswers.find(k => k.id === i);
+                
+                let nameCorrect = false;
+                let typeCorrect = false;
+
+                if (key) {
+                    nameCorrect = checkAnswer(nameInput, key.names);
+                    typeCorrect = checkAnswer(typeInput, key.types);
+                }
+
+                // Calculate points (ปรับเป็นอย่างละ 0.5 คะแนน เพื่อให้รวมเป็น 10 คะแนนเต็ม)
+                let score = 0;
+                if (nameCorrect) score += 0.5;
+                if (typeCorrect) score += 0.5;
+                
+                totalScore += score;
+
+                answers.push({
+                    id: i,
+                    name: nameInput,
+                    type: typeInput,
+                    material: materialInput,
+                    nameCorrect: nameCorrect,
+                    typeCorrect: typeCorrect,
+                    score: score
+                });
+            }
+
+            sessionStorage.setItem('student_answers', JSON.stringify(answers));
+            sessionStorage.setItem('student_score', totalScore);
+
+            renderDashboard(answers, totalScore);
+            changePage(3);
+            launchConfetti();
+            
+            // Show Custom Modal
+            setTimeout(() => {
+                const modalText = document.getElementById('modal-score-text');
+                modalText.innerText = `คะแนนรวมของคุณคือ: ${totalScore} / 10 คะแนน`;
+                document.getElementById('submit-modal').classList.remove('hidden');
+            }, 800);
+        }
+
+        function closeModal() {
+            document.getElementById('submit-modal').classList.add('hidden');
+        }
+
+        // --- PAGE 3 LOGIC ---
+        function renderDashboard(answers, totalScore) {
+            if (totalScore === undefined) {
+                totalScore = sessionStorage.getItem('student_score') || 0;
+            }
+            
+            const name = sessionStorage.getItem('student_name');
+            const sClass = sessionStorage.getItem('student_class');
+            const no = sessionStorage.getItem('student_no');
+
+            // Info
+            document.getElementById('summary-name').innerText = name;
+            document.getElementById('summary-class').innerText = sClass;
+            document.getElementById('summary-no').innerText = no;
+            document.getElementById('total-score-display').innerText = `คะแนน: ${totalScore} / 10`;
+            
+            // Dynamic Watermark
+            document.getElementById('dynamic-watermark').innerText = `${name} - ${sClass} เลขที่ ${no}`;
+
+            // Timestamp
+            const now = new Date();
+            document.getElementById('timestamp').innerText = `ส่งเมื่อ: ${now.toLocaleDateString('th-TH')} ${now.toLocaleTimeString('th-TH')}`;
+
+            // Answers
+            const container = document.getElementById('answers-display');
+            container.innerHTML = '';
+
+            answers.forEach(ans => {
+                const nameIcon = ans.nameCorrect ? '<i class="fas fa-check-circle text-green-500 ml-1"></i>' : '<i class="fas fa-times-circle text-red-300 ml-1"></i>';
+                const typeIcon = ans.typeCorrect ? '<i class="fas fa-check-circle text-green-500 ml-1"></i>' : '<i class="fas fa-times-circle text-red-300 ml-1"></i>';
+
+                const card = `
+                    <div class="break-inside-avoid mb-4 bg-gray-50 border-l-4 border-brand-400 pl-4 py-3 pr-3 rounded-r-xl relative group">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-[10px] font-black text-brand-300 uppercase tracking-wider">ข้อที่ ${ans.id}</span>
+                        </div>
+                        
+                        <!-- ส่วนที่แสดงชื่อเครื่องดนตรี -->
+                        <div class="mb-2 pb-2 border-b border-gray-200">
+                            <span class="block text-xs text-gray-400">ชื่อเครื่องดนตรี</span>
+                            <div class="flex items-center">
+                                <span class="text-lg font-bold text-brand-700 leading-tight mr-2">${ans.name}</span>
+                                ${nameIcon}
+                            </div>
+                        </div>
+
+                        <div class="text-sm space-y-1">
+                            <div class="flex items-center justify-between gap-2">
+                                <div class="flex items-center">
+                                    <span class="text-gray-400 font-medium text-xs w-12 flex-shrink-0">ประเภท:</span>
+                                    <span class="font-medium text-gray-600">${ans.type}</span>
+                                    ${typeIcon}
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <span class="text-gray-400 font-medium text-xs w-12 flex-shrink-0">วัสดุ:</span>
+                                <span class="font-medium text-gray-600">${ans.material}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += card;
+            });
+        }
+
+        // --- UTILS ---
+        function launchConfetti() {
+            const duration = 3000;
+            const animationEnd = Date.now() + duration;
+            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+            const interval = setInterval(function() {
+                const timeLeft = animationEnd - Date.now();
+                if (timeLeft <= 0) return clearInterval(interval);
+                const particleCount = 50 * (timeLeft / duration);
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: Math.random(), y: Math.random() - 0.2 } }));
+            }, 250);
+        }
+
+        function startDownload() {
+            const captureArea = document.getElementById('capture-area');
+            
+            // Temporary styling fixes for html2canvas
+            const originalClass = captureArea.className;
+            captureArea.classList.add('capture-mode');
+            
+            // Hide watermark placeholder logic if any, ensure it's visible
+            document.querySelector('.watermark').style.display = 'block';
+
+            html2canvas(captureArea, {
+                scale: 2.5, // Higher quality
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: '#ffffff',
+                windowWidth: 1000,
+                onclone: (clonedDoc) => {
+                    // Ensure elements are visible in clone
+                    clonedDoc.querySelector('.watermark').style.display = 'block';
+                }
+            }).then(canvas => {
+                captureArea.className = originalClass; // Revert styling
+                document.querySelector('.watermark').style.display = ''; // Revert watermark visibility
+
+                const link = document.createElement('a');
+                link.download = `ใบงาน_${sessionStorage.getItem('student_name')}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+
+        function resetApp() {
+            if(confirm("ต้องการล้างข้อมูลและเริ่มใหม่ทั้งหมดใช่หรือไม่?")) {
+                sessionStorage.clear();
+                window.location.reload();
+            }
+        }
+    </script>
+</body>
+</html>
